@@ -1,0 +1,64 @@
+{
+  "entities": {
+    "DesignItem": {
+      "title": "DesignItem",
+      "description": "Item portofolio desain atau aset pendukung",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "image": { "type": "string" },
+        "svgContent": { "type": "string" },
+        "ratio": { "type": "string" },
+        "pixels": { "type": "string" },
+        "order": { "type": "number" },
+        "archived": { "type": "boolean" },
+        "deleted": { "type": "boolean" }
+      },
+      "required": ["id", "title"]
+    },
+    "TrafficStats": {
+      "title": "TrafficStats",
+      "description": "Statistik lalu lintas kunjungan portofolio",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "views": { "type": "number" },
+        "visitors": { "type": "number" },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["id"]
+    },
+    "TrashItem": {
+      "title": "TrashItem",
+      "description": "Item yang dihapus sementara berada di keranjang sampah",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string" },
+        "item": { "type": "object" },
+        "deletedAt": { "type": "string" }
+      },
+      "required": ["id", "type", "deletedAt"]
+    }
+  },
+  "firestore": {
+    "/fanratech_designs/{designId}": {
+      "schema": "DesignItem",
+      "description": "Koleksi item-item portofolio desain utama"
+    },
+    "/fanratech_assets/{assetId}": {
+      "schema": "DesignItem",
+      "description": "Koleksi item-item aset vektor pendukung"
+    },
+    "/fanratech_traffic/{trafficId}": {
+      "schema": "TrafficStats",
+      "description": "Statistik lalu lintas kunjungan"
+    },
+    "/fanratech_trash/{trashId}": {
+      "schema": "TrashItem",
+      "description": "Koleksi item yang dihapus sementara (recycle bin)"
+    }
+  }
+}

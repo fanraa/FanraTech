@@ -1,0 +1,8 @@
+{
+  "name": "Remix: Remix: FanraTech 1.3",
+  "description": "Portofolio desain interaktif dan responsif karya fanratech dengan filter kategori, detail elemen, dan unduh aset.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

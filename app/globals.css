@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@theme {
+  --font-lobster: var(--font-lobster);
+
+  --color-white: #F9FAFB;
+  --color-slate-50: #F9FAFB;
+  --color-gray-50: #F9FAFB;
+  --color-zinc-50: #F9FAFB;
+  --color-neutral-50: #F9FAFB;
+
+  --color-slate-950: #111827;
+  --color-slate-900: #111827;
+  --color-gray-900: #111827;
+  --color-zinc-900: #111827;
+  --color-black: #111827;
+}
+
+html, body {
+  background-color: #F9FAFB !important;
+  color: #111827 !important;
+}
+
+/* Completely Hide Native Scrollbars Globally while keeping scrolling active */
+::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Firefox, IE and Edge scrollbar removal */
+html, body, * {
+  -ms-overflow-style: none !important; /* IE and Edge */
+  scrollbar-width: none !important; /* Firefox */
+}
+
+/* Scrollbar None Utility */
+.scrollbar-none {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Shimmer Animation Utility for Elegant Image Lazy Loading Placeholders */
+@utility shimmer-bg {
+  background: linear-gradient(90deg, #F3F4F6 25%, #E5E7EB 50%, #F3F4F6 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+

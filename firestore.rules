@@ -1,0 +1,34 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Rules for FanraTech Portfolio items
+    match /fanratech_designs/{designId} {
+      allow read, write: if true;
+    }
+
+    match /fanratech_assets/{assetId} {
+      allow read, write: if true;
+    }
+
+    match /fanratech_traffic/{trafficId} {
+      allow read, write: if true;
+    }
+
+    match /fanratech_trash/{trashId} {
+      allow read, write: if true;
+    }
+
+    match /fanratech_users/{userId} {
+      allow read, write: if true;
+    }
+
+    match /fanratech_admin/{document=**} {
+      allow read, write: if true;
+    }
+
+    // Default deny for fallback
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
