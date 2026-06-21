@@ -17,23 +17,16 @@ export default function ContactForm() {
   const [submissionError, setSubmissionError] = useState('');
   const [sentMessage, setSentMessage] = useState<string | null>(null);
   const [trackingId, setTrackingId] = useState('');
-  const [countdown, setCountdown] = useState(15);
 
-  // Auto-revert countdown when message is successfully sent
+  // Auto-revert success status after 5 seconds
   useEffect(() => {
     if (status !== 'success') return;
 
-    const interval = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          setStatus('idle');
-          return 15;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    const timeout = setTimeout(() => {
+      setStatus('idle');
+    }, 5000);
 
-    return () => clearInterval(interval);
+    return () => clearTimeout(timeout);
   }, [status]);
 
   // Client-side sanitization check to prevent any script or code block injections
@@ -53,6 +46,17 @@ export default function ContactForm() {
     return true;
   };
 
+  const validateName = (inputName: string): boolean => {
+    if (inputName.length < 3) return false;
+    // Cek huruf vokal: harus ada setidaknya 1 huruf vokal untuk bahasa Indonesia/Inggris (menghindari spam seperti "hsdhksbdbsd")
+    if (!/[aeiouyAEIOUY]/.test(inputName)) return false;
+    // Cek karakter yang berulang 3 kali berturut-turut (misal: "aaa")
+    if (/(.)\1{2,}/.test(inputName)) return false;
+    // Cek karakter selain abjad, spasi, titik, koma, dsb
+    if (/[^a-zA-Z\s.,'-]/.test(inputName)) return false;
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmissionError('');
@@ -65,6 +69,15 @@ export default function ContactForm() {
       setSubmissionError(t(
         'Harap lengkapi semua kolom formulir (Nama, Email, dan Pesan).',
         'Please complete all form fields (Name, Email, and Message).'
+      ));
+      setStatus('error');
+      return;
+    }
+
+    if (!validateName(cleanName)) {
+      setSubmissionError(t(
+        'Harap masukkan nama asli atau valid (hindari input acak).',
+        'Please enter a valid real name (avoid random characters).'
       ));
       setStatus('error');
       return;
@@ -145,11 +158,10 @@ Sistem Notifikasi Kemitraan FanraTech`,
 
       if (response.ok && resData.success) {
         setTrackingId(generatedId);
-        setCountdown(15);
         setStatus('success');
         setSentMessage(t(
-          `Terima kasih! Pesan Anda telah berhasil terkirim. Gagasan Anda akan segera ditinjau dan dikoordinasikan secara profesional dengan tanggapan terbaik secepatnya.`,
-          `Thank you! Your message has been sent successfully. Your proposal will be reviewed immediately and we will coordinate professional feedback as soon as possible.`
+          `Terima kasih! Pesan Anda telah berhasil terkirim (#${generatedId}).`,
+          `Thank you! Your message has been sent successfully (#${generatedId}).`
         ));
         
         // Clear all states on successful transmission
@@ -222,62 +234,38 @@ Sistem Notifikasi Kemitraan FanraTech`,
             </span>
           </div>
 
-          <AnimatePresence mode="wait">
-            {status === 'success' ? (
+          <AnimatePresence>
+            {status === 'success' && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                className="py-10 px-4 rounded-xl flex flex-col items-center text-center space-y-5"
+                initial={{ opacity: 0, y: -10, height: 0 }}
+                animate={{ opacity: 1, y: 0, height: 'auto' }}
+                exit={{ opacity: 0, y: -10, height: 0 }}
+                className="mb-6 overflow-hidden"
               >
-                <div className="w-16 h-16 shrink-0 flex items-center justify-center rounded-full bg-emerald-50 border border-emerald-100 shadow-xs">
-                  <Image 
-                    src="https://cdn-icons-png.flaticon.com/128/12503/12503776.png" 
-                    alt="Success" 
-                    width={40}
-                    height={40}
-                    className="object-contain"
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-                <div className="space-y-4 max-w-md flex flex-col items-center">
-                  <h4 className="font-display font-extrabold text-[#111827] text-lg">
-                    {t('Pesan Berhasil Terkirim!', 'Message Sent Successfully!')}
-                  </h4>
-                  <div className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-slate-50 border border-slate-200 rounded-full font-mono text-[10px] sm:text-xs text-[#111827] font-bold">
-                    <span className="text-slate-500 font-semibold">{t('ID Pelacakan:', 'Tracking ID:')}</span>
-                    <span className="text-[#111827]">#{trackingId}</span>
+                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3">
+                  <div className="w-8 h-8 shrink-0 flex items-center justify-center rounded-full bg-emerald-100">
+                    <Image 
+                      src="https://cdn-icons-png.flaticon.com/128/12503/12503776.png" 
+                      alt="Success" 
+                      width={16}
+                      height={16}
+                      className="object-contain"
+                      referrerPolicy="no-referrer"
+                    />
                   </div>
-                  <p className="text-slate-500 text-xs sm:text-[13px] font-sans leading-relaxed">
-                    {sentMessage}
-                  </p>
-                </div>
-                
-                <div className="pt-2 flex flex-col items-center gap-1">
-                  <button
-                    id="btn-kirim-lagi"
-                    onClick={() => {
-                      setStatus('idle');
-                      setCountdown(15);
-                    }}
-                    className="text-xs font-bold text-slate-800 hover:text-black hover:underline cursor-pointer transition py-1 bg-transparent border-0 focus:outline-none"
-                  >
-                    {t('Kirim Pesan Lainnya', 'Send Another Message')}
-                  </button>
-                  <span className="text-[10px] text-slate-400 font-mono">
-                    {lang === 'id' 
-                      ? `Formulir otomatis kembali dalam ${countdown} detik` 
-                      : `Form resets automatically in ${countdown} seconds`
-                    }
-                  </span>
+                  <div>
+                    <h4 className="text-sm font-bold text-emerald-900">{t('Terkirim!', 'Sent!')}</h4>
+                    <p className="text-[11px] sm:text-xs text-emerald-700 font-medium">{sentMessage}</p>
+                  </div>
                 </div>
               </motion.div>
-            ) : (
-              <motion.form
-                layout
-                onSubmit={handleSubmit}
-                className="space-y-4.5"
-              >
+            )}
+          </AnimatePresence>
+
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4.5"
+          >
                 {status === 'error' && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
@@ -407,9 +395,7 @@ Sistem Notifikasi Kemitraan FanraTech`,
                     </>
                   )}
                 </button>
-              </motion.form>
-            )}
-          </AnimatePresence>
+          </form>
         </div>
 
       </div>
